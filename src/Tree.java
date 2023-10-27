@@ -2,7 +2,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 
-public class Graph<Vertex> implements GraphInterface<Vertex> {
+public class Tree<Vertex> implements TreeInterface<Vertex> {
     private final HashMap<Vertex, HashSet<Vertex>> adjacencyList = new HashMap<>();
 
     /**
@@ -10,16 +10,35 @@ public class Graph<Vertex> implements GraphInterface<Vertex> {
      *
      * @param start the starting point of the edge
      * @param end   the end point of the edge
+     * @throws IllegalArgumentException if the edge creates a loop
      */
-    public void addEdge(Vertex start, Vertex end) {
+    public void addEdge(Vertex start, Vertex end) throws IllegalArgumentException {
         if (!adjacencyList.containsKey(start)) {
             adjacencyList.put(start, new HashSet<>());
         }
         if (!adjacencyList.containsKey(end)) {
             adjacencyList.put(end, new HashSet<>());
         }
+
+        if (!canHaveAsEdge(start, end)) {
+            throw new IllegalArgumentException("No loops allowed!");
+        }
+
         adjacencyList.get(start).add(end);
         adjacencyList.get(end).add(start);
+    }
+
+    public Boolean canHaveAsEdge(Vertex start, Vertex end) {
+        if (start == end) {
+            return false;
+        }
+        if (!adjacencyList.containsKey(start)) {
+            return true;
+        }
+        if (!adjacencyList.containsKey(end)) {
+            return true;
+        }
+        return !adjacencyList.get(start).contains(end);
     }
 
     /**
@@ -108,6 +127,14 @@ public class Graph<Vertex> implements GraphInterface<Vertex> {
      */
     @Override
     public int applyMetaheuristic(int maxIterations) {
+        return 0;
+    }
+
+    /**
+     * Returns the minimum path partition number of this tree. Can be computed in linear time!
+     */
+    @Override
+    public int getMinimumPathPartitionNumber() {
         return 0;
     }
 }
