@@ -66,4 +66,37 @@ public class GraphTests {
         assertThrows(IllegalArgumentException.class, () -> tree.addEdge(5, 4));
     }
 
+    @Test
+    public void testPathCover(){
+        Tree<Integer> tree = new Tree<>();
+        tree.addEdge(1,2);
+        tree.addEdge(1,3);
+
+        tree.addEdge(2,4);
+        tree.addEdge(2,5);
+
+        tree.addEdge(3,6);
+        tree.addEdge(3,7);
+
+        tree.addEdge(4,8);
+        tree.addEdge(4,9);
+        tree.addEdge(4,10);
+        tree.addEdge(4,11);
+
+        tree.addEdge(5, 12);
+
+        tree.addEdge(7, 13);
+
+        tree.addEdge(9, 14);
+
+        tree.addEdge(11, 15);
+
+        tree.addEdge(13, 16);
+
+        assertEquals(16, tree.getNumberOfVertices());
+        assertEquals(15, tree.getNumberOfEdges());
+
+        assertEquals(4, tree.getMinimumPathPartitionNumber());
+    }
+
 }
