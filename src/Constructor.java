@@ -2,15 +2,19 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
 
+
 public class Constructor {
+
     /**
      * Constructs a graph from a file.
+     *
      * @param path the path to the file describing the graph
      * @return the constructed graph;
      * @throws RuntimeException if the file is not found
      * @throws RuntimeException if the constructed graph does not match the expected values
      */
-    public static GraphInterface<Integer> createGraphFromFile(String path){
+    public static GraphInterface<Integer> createGraphFromFile(String path)
+    {
         Graph<Integer> graph = new Graph<>();
 
         int vertices;
@@ -37,18 +41,21 @@ public class Constructor {
         }
 
         if (vertices != graph.getNumberOfVertices() ||
-        edges != graph.getNumberOfEdges())
+                edges != graph.getNumberOfEdges())
             throw new RuntimeException("Construction failed, number of edges or vertices don't match expected values!");
 
         return graph;
     }
 
+
     /**
      * Extract two integers from a string seperated with one space
+     *
      * @param line the line containing the two integers
      * @return a array with two integers
      */
-    private static int[] extractIntegers(String line) {
+    private static int[] extractIntegers(String line)
+    {
         String[] strings = line.split(" ");
         int[] numbers = new int[2];
 
