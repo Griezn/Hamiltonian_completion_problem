@@ -146,7 +146,6 @@ public class Graph<Vertex> implements GraphInterface<Vertex> {
     {
         Tree<Vertex> tree = (Tree<Vertex>) getInitialSpanningTree();
         int pp = tree.getMinimumPathPartitionNumber();
-        System.out.println("Initial pp: " + pp);
         int amountOfBadPerms = 0;
 
         while (amountOfBadPerms < maxIterations) {
@@ -163,7 +162,6 @@ public class Graph<Vertex> implements GraphInterface<Vertex> {
             }
         }
 
-        System.out.println("Final pp: " + pp);
         return pp;
     }
 
@@ -181,7 +179,6 @@ public class Graph<Vertex> implements GraphInterface<Vertex> {
         double alpha = 0.95;
         Tree<Vertex> tree = (Tree<Vertex>) getInitialSpanningTree();
         int pp = tree.getMinimumPathPartitionNumber();
-        System.out.println("Initial pp: " + pp);
 
         while (Tmax > Tmin) {
             tree.perturb(this);
@@ -199,7 +196,6 @@ public class Graph<Vertex> implements GraphInterface<Vertex> {
             Tmax *= alpha;
         }
 
-        System.out.println("Final pp: " + pp);
         return pp;
     }
 }
