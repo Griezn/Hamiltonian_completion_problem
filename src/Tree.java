@@ -222,11 +222,13 @@ public class Tree<Vertex> extends Graph<Vertex> implements TreeInterface<Vertex>
      *
      * @param graph the graph to apply the move operator with
      * @see Tree#connectPaths(Graph)
+     * @see Tree#rotationMoves(Graph)
      * @see Tree#restoreTree(Graph)
      */
     public void perturb(Graph<Vertex> graph)
     {
         connectPaths(graph);
+        rotationMoves(graph);
         restoreTree(graph);
     }
 
@@ -251,6 +253,37 @@ public class Tree<Vertex> extends Graph<Vertex> implements TreeInterface<Vertex>
                     checkedAddEdge(v, w);
                 }
                 break;
+            }
+        }
+    }
+
+
+    /**
+     * Changes routes on a certain path partition of the tree.
+     *
+     * @param graph the graph to apply the rotation move operator with
+     */
+    public void rotationMoves(Graph<Vertex> graph)
+    {
+        for (Vertex v : getVertices()) {
+            if (getDegree(v) != 2) continue;
+
+            for (Vertex w : graph.getNeighborsOf(v)) {
+                if (getDegree(w) != 1) continue;
+                if (canHaveAsEdge(v, w)) continue;
+
+                Vertex x = (Vertex) getNeighborsOf(v).toArray()[0];
+                Vertex y = (Vertex) getNeighborsOf(v).toArray()[1];
+
+                if (getDegree(x) != 1){
+                    removeEdge(v, x);
+                    checkedAddEdge(v, w);
+                    return;
+                } else if(getDegree(y) != 1){
+                    removeEdge(v, y);
+                    checkedAddEdge(v, w);
+                    return;
+                }
             }
         }
     }
