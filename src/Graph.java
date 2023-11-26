@@ -4,6 +4,13 @@ import java.util.HashSet;
 import java.util.Stack;
 
 
+/**
+ * A class representing a graph.
+ *
+ * @param <Vertex> the type of the vertices
+ * @author Seppe Degryse
+ * @version 1.0
+ */
 public class Graph<Vertex> implements GraphInterface<Vertex> {
 
     private final HashMap<Vertex, HashSet<Vertex>> adjacencyList = new HashMap<>();
