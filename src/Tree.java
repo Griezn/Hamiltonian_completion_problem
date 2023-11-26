@@ -1,32 +1,77 @@
-import java.util.HashSet;
+import java.util.*;
 
+
+/**
+ * A tree is a graph with no cycles.
+ * @param <Vertex> the type of the vertices
+ * @see Graph
+ * @author Seppe Degryse
+ * @version 2.0
+ */
 public class Tree<Vertex> extends Graph<Vertex> implements TreeInterface<Vertex> {
+
     private Vertex root = null;
+
+    private final UnionFind<Vertex> vertexUnionFind = new UnionFind<>();
+
+
+    /**
+     * Resets the union find of the tree.
+     */
+    public void resetUnionFind()
+    {
+        ArrayList<Vertex> vertices = new ArrayList<>(getVertices());
+        for (Vertex v : vertices)
+            vertexUnionFind.makeSet(v);
+    }
+
+
+    /**
+     * Generates the union find of the tree.
+     */
+    public void generateUnionFind()
+    {
+        for (Vertex v : getVertices()) {
+            for (Vertex w : getNeighborsOf(v)) {
+                vertexUnionFind.union(v, w);
+            }
+        }
+    }
+
 
     /**
      * Sets the root of the tree if it is a vertex of the tree.
+     *
      * @param root the root of the tree
      */
-    public void setRoot(Vertex root) {
+    public void setRoot(Vertex root)
+    {
         if (canHaveAsRoot(root)) this.root = root;
     }
 
+
     /**
      * Getter for the root.
+     *
      * @return the root or the first vertex if no root is se
      */
-    public Vertex getRoot() {
+    public Vertex getRoot()
+    {
         return root != null ? root : (Vertex) getVertices().toArray()[0];
     }
 
+
     /**
      * Checks if a Vertex can be the root of this tree.
+     *
      * @param root the vertex to be checked
      * @return true if allowed, false otherwise
      */
-    public Boolean canHaveAsRoot(Vertex root) {
+    public Boolean canHaveAsRoot(Vertex root)
+    {
         return getVertices().contains(root);
     }
+
 
     /**
      * Adds an edge to the graph.
@@ -36,13 +81,30 @@ public class Tree<Vertex> extends Graph<Vertex> implements TreeInterface<Vertex>
      * @throws IllegalArgumentException if the edge creates a loop
      */
     @Override
-    public void addEdge(Vertex start, Vertex end) throws IllegalArgumentException {
-        if (!canHaveAsEdge(start, end)) {
-            throw new IllegalArgumentException("No loops allowed!");
-        }
+    public void addEdge(Vertex start, Vertex end) throws IllegalArgumentException
+    {
+        if (!canHaveAsEdge(start, end))
+            throw new IllegalArgumentException("Edge creates a loop!");
 
+        vertexUnionFind.union(start, end);
         super.addEdge(start, end);
     }
+
+
+    /**
+     * Adds an edge to the graph without checking if it creates a loop.
+     *
+     * @param start the starting point of the edge
+     * @param end   the end point of the edge
+     * @implNote Only use this method if you are sure that the edge does not create a loop!
+     * @see Tree#canHaveAsEdge(Object, Object)
+     */
+    private void checkedAddEdge(Vertex start, Vertex end)
+    {
+        vertexUnionFind.union(start, end);
+        super.addEdge(start, end);
+    }
+
 
     /**
      * Returns whether the edge can be added to the graph.
@@ -50,51 +112,82 @@ public class Tree<Vertex> extends Graph<Vertex> implements TreeInterface<Vertex>
      * @param start the starting point of the edge
      * @param end   the end point of the edge
      */
-    public Boolean canHaveAsEdge(Vertex start, Vertex end) {
-        if (start == end) {
-            return false;
-        }
-        if (!getVertices().contains(start)) {
-            return true;
-        }
-        if (getVertices().contains(end)) {
-            return false;
-        }
-        return !getNeighborsOf(start).contains(end);
+    public Boolean canHaveAsEdge(Vertex start, Vertex end)
+    {
+        if (vertexUnionFind.find(start) == null)
+            vertexUnionFind.makeSet(start);
+
+        if (vertexUnionFind.find(end) == null)
+            vertexUnionFind.makeSet(end);
+
+        return vertexUnionFind.find(start) != vertexUnionFind.find(end);
     }
+
 
     /**
      * Returns the minimum path partition number of this tree. Can be computed in linear time!
      */
     @Override
-    public int getMinimumPathPartitionNumber() {
-        pathCover(getRoot(), null);
-        return calculateNumberOfPath()-1;
+    public int getMinimumPathPartitionNumber()
+    {
+        pathCover(getRoot());
+        return calculateNumberOfPath();
     }
 
+
     /**
-     * Reduces the tree to a tree with only vertices of degree two
+     * Creates the path cover of a tree
+     *
+     * @param v the vertex to start the path cover from, usually root
+     * @see Tree#process(Vertex)
      */
-    private void pathCover(Vertex v, Vertex x) {
-        for (Vertex z : getNeighborsOf(v)) {
-            if (z == x) continue;
-            pathCover(z, v);
+    private void pathCover(Vertex v)
+    {
+        Deque<Vertex> stack = new ArrayDeque<>();
+        Deque<Vertex> processingOrder = new ArrayDeque<>();
+        Set<Vertex> visited = new HashSet<>();
+
+        stack.push(v);
+
+        while (!stack.isEmpty()) {
+            Vertex current = stack.pop();
+
+            if (!visited.contains(current)) {
+                visited.add(current);
+
+                // Add neighbors to stack
+                Collection<Vertex> neighbors = getNeighborsOf(current);
+                for (Vertex neighbor : neighbors) {
+                    if (!neighbor.equals(current) && !visited.contains(neighbor)) {
+                        stack.push(neighbor);
+                    }
+                }
+
+                // Add to the processing order
+                processingOrder.push(current);
+            }
         }
-        process(v);
+
+        // Process vertices in the correct order
+        while (!processingOrder.isEmpty()) {
+            Vertex vertex = processingOrder.pop();
+            process(vertex);
+        }
     }
 
 
     /**
      * Removes all neighbours of v except the first two.
+     *
      * @param v the vertex to remove the neighbours from
      */
-    private void process(Vertex v) {
+    private void process(Vertex v)
+    {
         if (getDegree(v) < 3) {
-           return;
+            return;
         }
 
-
-        HashSet<Vertex> copy = new HashSet<>(getNeighborsOf(v));
+        Collection<Vertex> copy = new ArrayList<>(getNeighborsOf(v));
         Vertex x, y;
         x = (Vertex) getNeighborsOf(v).toArray()[0];
         y = (Vertex) getNeighborsOf(v).toArray()[1];
@@ -102,24 +195,83 @@ public class Tree<Vertex> extends Graph<Vertex> implements TreeInterface<Vertex>
         for (Vertex z : copy) {
             if (z == x || z == y) continue;
 
-            getNeighborsOf(z).remove(v);
-            getNeighborsOf(v).remove(z);
+            removeEdge(v, z);
         }
     }
 
 
     /**
-     * Calculates the number of paths in the tree
+     * Calculates the number of paths in the tree, only works correctly after {@link Tree#pathCover(Vertex)}.
+     *
      * @return the amount of paths in the tree
-     * @apiNote only works correctly after {@link Tree#pathCover(Vertex, Vertex)}
      */
-    private int calculateNumberOfPath(){
+    private int calculateNumberOfPath()
+    {
         int count = 0;
 
         for (Vertex v : getVertices()) {
-            if (getDegree(v) == 1) count++;
+            if (getDegree(v) <= 1) count++;
         }
 
-        return count % 2 == 0 ? count/2 : (count+1)/2 ;
+        return count % 2 == 0 ? count / 2 : (count + 1) / 2;
+    }
+
+
+    /**
+     * Applies the move operator to the tree.
+     *
+     * @param graph the graph to apply the move operator with
+     * @see Tree#connectPaths(Graph)
+     * @see Tree#restoreTree(Graph)
+     */
+    public void perturb(Graph<Vertex> graph)
+    {
+        connectPaths(graph);
+        restoreTree(graph);
+    }
+
+
+    /**
+     * Connects path partitions of the tree by adding edges from the graph.
+     *
+     * @param graph the graph to connect the paths with
+     * @see Tree#pathCover(Object)
+     */
+    public void connectPaths(Graph<Vertex> graph)
+    {
+        resetUnionFind();
+        generateUnionFind();
+        for (Vertex v : getVertices()) {
+            if (getDegree(v) > 1) continue;
+
+            for (Vertex w : graph.getNeighborsOf(v)) {
+                if (getDegree(w) > 1) continue;
+
+                if (canHaveAsEdge(v, w)) {
+                    checkedAddEdge(v, w);
+                }
+                break;
+            }
+        }
+    }
+
+
+    /**
+     * Restores the tree to a valid tree by adding edges from the graph until it contains n-1 edges.
+     *
+     * @param graph the graph to restore the tree from
+     */
+    public void restoreTree(Graph<Vertex> graph)
+    {
+        int n = getNumberOfVertices() - 1;
+        for (Vertex v : getVertices()) {
+            for (Vertex w : graph.getNeighborsOf(v)) {
+                if (getNumberOfEdges() >= n) return;
+
+                if (canHaveAsEdge(v, w)) {
+                    checkedAddEdge(v, w);
+                }
+            }
+        }
     }
 }
