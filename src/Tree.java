@@ -55,6 +55,7 @@ public class Tree<Vertex> extends Graph<Vertex> implements TreeInterface<Vertex>
      *
      * @return the root or the first vertex if no root is se
      */
+    @SuppressWarnings("unchecked")
     public Vertex getRoot()
     {
         return root != null ? root : (Vertex) getVertices().toArray()[0];
@@ -155,20 +156,16 @@ public class Tree<Vertex> extends Graph<Vertex> implements TreeInterface<Vertex>
             if (!visited.contains(current)) {
                 visited.add(current);
 
-                // Add neighbors to stack
                 Collection<Vertex> neighbors = getNeighborsOf(current);
                 for (Vertex neighbor : neighbors) {
                     if (!neighbor.equals(current) && !visited.contains(neighbor)) {
                         stack.push(neighbor);
                     }
                 }
-
-                // Add to the processing order
                 processingOrder.push(current);
             }
         }
 
-        // Process vertices in the correct order
         while (!processingOrder.isEmpty()) {
             Vertex vertex = processingOrder.pop();
             process(vertex);
@@ -181,6 +178,7 @@ public class Tree<Vertex> extends Graph<Vertex> implements TreeInterface<Vertex>
      *
      * @param v the vertex to remove the neighbours from
      */
+    @SuppressWarnings("unchecked")
     private void process(Vertex v)
     {
         if (getDegree(v) < 3) {
@@ -263,6 +261,7 @@ public class Tree<Vertex> extends Graph<Vertex> implements TreeInterface<Vertex>
      *
      * @param graph the graph to apply the rotation move operator with
      */
+    @SuppressWarnings("unchecked")
     public void rotationMoves(Graph<Vertex> graph)
     {
         for (Vertex v : getVertices()) {

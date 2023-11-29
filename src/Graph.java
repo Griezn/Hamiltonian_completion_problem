@@ -120,6 +120,7 @@ public class Graph<Vertex> implements GraphInterface<Vertex> {
      * (metaheuristic) algorithm.
      */
     @Override
+    @SuppressWarnings("unchecked")
     public TreeInterface<Vertex> getInitialSpanningTree()
     {
         Tree<Vertex> tree = new Tree<>();
@@ -183,7 +184,7 @@ public class Graph<Vertex> implements GraphInterface<Vertex> {
     {
         double Tmax = 100;
         double Tmin = 0.1;
-        double alpha = 0.95;
+        double alpha = 0.99;
         Tree<Vertex> tree = (Tree<Vertex>) getInitialSpanningTree();
         int pp = tree.getMinimumPathPartitionNumber();
 
