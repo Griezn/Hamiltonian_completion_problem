@@ -1,50 +1,63 @@
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Scanner;
+import java.util.stream.Stream;
 
 
 public class Benchmarks {
+
     private static final String path = "./Benchmarks/testingConnected/";
     private static final String data = "./Benchmarks/global_optima.csv";
+    private static final String outputDir = "./Benchmarks/results/";
     private static final ArrayList<String> graphs = new ArrayList<>();
     private static final ArrayList<Integer> optimalSolutions = new ArrayList<>();
+    private static File outputFile;
 
-    public static void main(String[] args) {
+
+    public static void main(String[] args)
+    {
         readData();
+        createFile();
         runBenchmarks();
     }
 
 
     public static void readData()
     {
-        try (Scanner scanner = new Scanner(new File(data)))
-        {
-            while (scanner.hasNextLine())
-            {
+        try (Scanner scanner = new Scanner(new File(data))) {
+            while (scanner.hasNextLine()) {
                 String line = scanner.nextLine();
                 String[] values = line.split(",");
                 graphs.add(values[0]);
                 optimalSolutions.add(Integer.parseInt(values[1]));
             }
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             System.out.println("Error reading file");
         }
+    }
+
+
+    public static void createFile()
+    {
+        String timestamp = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(new Date());
+        outputFile = new File(outputDir + timestamp + ".csv");
     }
 
 
     public static void runBenchmarks()
     {
         int size = graphs.size();
-        for (int i = 0; i < size; i++)
-        {
+        for (int i = 0; i < size; i++) {
             Graph<Integer> graph = (Graph<Integer>) Constructor.createGraphFromFile(path + graphs.get(i));
             int optimalSolution = optimalSolutions.get(i);
 
 
             long startTime = System.nanoTime();
-            int localSolution = graph.applyLocalSearchAlgorithm(3000) - 1;
+            int localSolution = graph.applyLocalSearchAlgorithm(50) - 1;
             long endTime = System.nanoTime();
             long localDuration = (endTime - startTime) / 1000000;
 
@@ -54,7 +67,7 @@ public class Benchmarks {
             endTime = System.nanoTime();
             long metaDuration = (endTime - startTime) / 1000000;
 
-            printResult(graphs.get(i), optimalSolution, localSolution, metaSolution, localDuration, metaDuration);
+            saveToCsv(graphs.get(i), optimalSolution, localSolution, metaSolution, localDuration, metaDuration);
         }
     }
 
@@ -70,4 +83,18 @@ public class Benchmarks {
         System.out.println();
     }
 
+
+    public static void saveToCsv(String graph, int optimal, int localSolution, int metaSolution, long localTime, long metaTime)
+    {
+        String line = graph + "," + optimal + "," + localSolution + "," + metaSolution + "," + localTime + "," + metaTime;
+        try {
+            FileWriter fw = new FileWriter(outputFile, true);
+            BufferedWriter bw = new BufferedWriter(fw);
+            bw.write(line);
+            bw.newLine();
+            bw.close();
+        } catch (Exception e) {
+            System.out.println("Error writing to file");
+        }
+    }
 }
