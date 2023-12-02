@@ -205,13 +205,16 @@ public class Tree<Vertex> extends Graph<Vertex> implements TreeInterface<Vertex>
      */
     private int calculateNumberOfPath()
     {
-        int count = 0;
+        int oneDegree = 0;
+        int zeroDegree = 0;
 
         for (Vertex v : getVertices()) {
-            if (getDegree(v) <= 1) count++;
+            if (getDegree(v) == 1) oneDegree++;
+            if (getDegree(v) == 0) zeroDegree++;
         }
 
-        return count % 2 == 0 ? count / 2 : (count + 1) / 2;
+        int count = oneDegree % 2 == 0 ? oneDegree / 2 : (oneDegree + 1) / 2;
+        return count + zeroDegree;
     }
 
 
@@ -305,5 +308,20 @@ public class Tree<Vertex> extends Graph<Vertex> implements TreeInterface<Vertex>
                 }
             }
         }
+    }
+
+
+    /**
+     * Returns the number of isolated vertices in the tree.
+     *
+     * @return the number of isolated vertices
+     */
+    public int getNumberOfIsolated()
+    {
+        int count = 0;
+        for (Vertex v : getVertices()) {
+            if (getDegree(v) == 0) count++;
+        }
+        return count;
     }
 }
