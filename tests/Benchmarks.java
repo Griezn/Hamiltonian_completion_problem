@@ -56,17 +56,19 @@ public class Benchmarks {
 
 
             long startTime = System.nanoTime();
-            int localSolution = graph.applyLocalSearchAlgorithm(50) - 1;
+            int localSolution = graph.applyLocalSearchAlgorithm(100);
             long endTime = System.nanoTime();
             long localDuration = (endTime - startTime) / 1000000;
 
             graph = (Graph<Integer>) Constructor.createGraphFromFile(path + graphs.get(i));
             startTime = System.nanoTime();
-            int metaSolution = graph.applyMetaheuristic(3000) - 1;
+            int metaSolution = graph.applyMetaheuristic(100);
+
             endTime = System.nanoTime();
             long metaDuration = (endTime - startTime) / 1000000;
 
             saveToCsv(graphs.get(i), optimalSolution, localSolution, metaSolution, localDuration, metaDuration);
+            System.out.println(i + 1 + " /" + size + " done in " + metaDuration + "ms");
         }
     }
 
