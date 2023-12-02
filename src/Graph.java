@@ -39,6 +39,11 @@ public class Graph<Vertex> implements GraphInterface<Vertex> {
     }
 
 
+    /**
+     * Removes an edge from the graph.
+     * @param start the starting point of the edge
+     * @param end the end point of the edge
+     */
     public void removeEdge(Vertex start, Vertex end)
     {
         adjacencyList.get(start).remove(end);
@@ -124,7 +129,9 @@ public class Graph<Vertex> implements GraphInterface<Vertex> {
     public TreeInterface<Vertex> getInitialSpanningTree()
     {
         Tree<Vertex> tree = new Tree<>();
-        Vertex root = (Vertex) getVertices().toArray()[0];
+        // random number between 0 and the number of vertices
+        int random = (int) (Math.random() * getNumberOfVertices());
+        Vertex root = (Vertex) getVertices().toArray()[random];
 
         Stack<Vertex> stack = new Stack<>();
         stack.push(root);
@@ -152,25 +159,23 @@ public class Graph<Vertex> implements GraphInterface<Vertex> {
     @Override
     public int applyLocalSearchAlgorithm(int maxIterations)
     {
-        Tree<Vertex> tree = (Tree<Vertex>) getInitialSpanningTree();
-        int pp = tree.getMinimumPathPartitionNumber();
-        int amountOfBadPerms = 0;
+        int smallestPP = Integer.MAX_VALUE;
+        int amountOfTrees = 0;
 
-        while (amountOfBadPerms < maxIterations) {
-            tree.perturb(this);
-            int newPP = tree.getMinimumPathPartitionNumber();
-
-            if (newPP < pp) {
-                pp = newPP;
-            } else {
-                amountOfBadPerms++;
-            }
-            if (pp == 0) {
+        int num = Math.min(maxIterations, getNumberOfVertices());
+        while (amountOfTrees < num) {
+            Tree<Vertex> tree = (Tree<Vertex>) getInitialSpanningTree();
+            int pp = localSearch(tree);
+            if (pp == 1) {
                 return 0;
             }
+            if (pp < smallestPP) {
+                smallestPP = pp;
+            }
+            amountOfTrees++;
         }
 
-        return pp;
+        return smallestPP - 1;
     }
 
 
@@ -182,28 +187,105 @@ public class Graph<Vertex> implements GraphInterface<Vertex> {
     @Override
     public int applyMetaheuristic(int maxIterations)
     {
+        int smallestPP = Integer.MAX_VALUE;
+        int amountOfTrees = 0;
+
+        int num = Math.min(maxIterations, getNumberOfVertices());
+        while (amountOfTrees < num) {
+            Tree<Vertex> tree = (Tree<Vertex>) getInitialSpanningTree();
+            int pp = metaheuristicSearch(tree);
+            if (pp == 1) {
+                return 0;
+            }
+            if (pp < smallestPP) {
+                smallestPP = pp;
+            }
+            amountOfTrees++;
+        }
+
+        return smallestPP - 1;
+    }
+
+
+    /**
+     * Apply the local search algorithm. It returns an estimate for the minimum path partition number
+     * @param tree the tree to apply the local search algorithm on
+     * @return the minimum path partition number
+     */
+    public int localSearch(Tree<Vertex> tree)
+    {
+        int pp = tree.getMinimumPathPartitionNumber();
+
+        while (true) {
+            tree.perturb(this);
+            int newPP = tree.getMinimumPathPartitionNumber();
+
+            if (newPP == 1) {
+                return 1;
+            }
+            if (newPP < pp) {
+                pp = newPP;
+            } else {
+                return pp;
+            }
+        }
+    }
+
+
+    /**
+     * Apply the metaheuristic search algorithm. It returns an estimate for the minimum path partition number
+     * @param tree the tree to apply the metaheuristic search algorithm on
+     * @return the minimum path partition number
+     */
+    public int metaheuristicSearch(Tree<Vertex> tree)
+    {
         double Tmax = 100;
         double Tmin = 0.1;
-        double alpha = 0.99;
-        Tree<Vertex> tree = (Tree<Vertex>) getInitialSpanningTree();
+        double alpha = 0.933254;
         int pp = tree.getMinimumPathPartitionNumber();
+        int smallestPP = pp;
 
         while (Tmax > Tmin) {
             tree.perturb(this);
             int newPP = tree.getMinimumPathPartitionNumber();
 
+            if (newPP == 1) {
+                return 1;
+            }
             if (newPP < pp) {
                 pp = newPP;
+                if (pp < smallestPP) {
+                    smallestPP = pp;
+                }
             } else {
                 double p = Math.exp((pp - newPP) / Tmax);
                 if (Math.random() < p) {
                     pp = newPP;
+                } else {
+                    return smallestPP;
                 }
             }
 
             Tmax *= alpha;
         }
 
-        return pp;
+        return smallestPP;
+    }
+
+
+    /**
+     * Evaluating a tree means calculating the density, connectivity and isolated vertices.
+     * @param tree the tree to evaluate
+     * @return the evaluation of the tree
+     * @see Graph#metaheuristicSearch(Tree)
+     */
+    @SuppressWarnings("unused")
+    public float evaluate(Tree<Vertex> tree)
+    {
+        float connectivity = (float) tree.getMinimumPathPartitionNumber();
+        float density = (float) getNumberOfEdges() / tree.getNumberOfEdges();
+        float isolated = (float) tree.getNumberOfIsolated() / tree.getNumberOfVertices();
+
+        return density + connectivity - isolated;
     }
 }
