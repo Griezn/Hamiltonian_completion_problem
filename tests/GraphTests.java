@@ -172,6 +172,15 @@ public class GraphTests {
         return graph;
     }
 
+    private Graph<Integer> createTestGraph2()
+    {
+        return (Graph<Integer>) Constructor.createGraphFromFile("./Benchmarks/testingConnected/structured_tree_8_3");
+    }
+
+    private Graph<Integer> createTestGraphStarRandomLeaves()
+    {
+        return (Graph<Integer>) Constructor.createGraphFromFile("./Benchmarks/testingConnected/star_random_leaves_connected_100.in");
+    }
 
     @Test
     public void testPathCover()
@@ -187,5 +196,29 @@ public class GraphTests {
         Tree<Integer> tree = (Tree<Integer>) graph.getInitialSpanningTree();
         assertEquals(20, tree.getNumberOfVertices());
         assertEquals(19, tree.getNumberOfEdges());
+    }
+
+    @Test
+    public void testStructuredTree()
+    {
+        Graph<Integer> graph = createTestGraph2();
+        Tree<Integer> tree = (Tree<Integer>) graph.getInitialSpanningTree();
+        assertEquals(9841, tree.getNumberOfVertices());
+        assertEquals(9840, tree.getNumberOfEdges());
+
+        int pp = graph.applyLocalSearchAlgorithm(100);
+        System.out.println(pp);
+    }
+
+    @Test
+    public void testStarRandomLeaves15()
+    {
+        Graph<Integer> graph = createTestGraphStarRandomLeaves();
+        Tree<Integer> tree = (Tree<Integer>) graph.getInitialSpanningTree();
+        assertEquals(101, tree.getNumberOfVertices());
+        assertEquals(100, tree.getNumberOfEdges());
+
+        int pp = graph.applyLocalSearchAlgorithm(100);
+        System.out.println(pp);
     }
 }
