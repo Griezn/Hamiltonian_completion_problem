@@ -231,7 +231,7 @@ public class GraphTests {
         assertEquals(13, tree.getNumberOfVertices());
         assertEquals(12, tree.getNumberOfEdges());
 
-        int hcn = graph.applyLocalSearchAlgorithm(20);
+        graph.applyLocalSearchAlgorithm(20);
     }
 
 
@@ -243,7 +243,7 @@ public class GraphTests {
         assertEquals(101, tree.getNumberOfVertices());
         assertEquals(100, tree.getNumberOfEdges());
 
-        int hcn = graph.applyLocalSearchAlgorithm(100);
+        graph.applyLocalSearchAlgorithm(100);
     }
 
 
@@ -256,6 +256,6 @@ public class GraphTests {
         assertEquals(n * n, tree.getNumberOfVertices());
         assertEquals(n*n - 1, tree.getNumberOfEdges());
 
-        int hcn = graph.applyLocalSearchAlgorithm(100);
+        graph.applyLocalSearchAlgorithm(100);
     }
 }

@@ -265,7 +265,7 @@ public class Tree<Vertex> extends Graph<Vertex> implements TreeInterface<Vertex>
      *
      * @param graph the graph to apply the rotation move operator with
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "unused"})
     public void rotationMoves(Graph<Vertex> graph)
     {
         for (Vertex v : getVertices()) {
