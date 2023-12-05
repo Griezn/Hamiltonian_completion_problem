@@ -29,8 +29,9 @@ public class UnionFind<Vertex> {
     {
         if (parent.get(vertex) != vertex) {
             parent.put(vertex, find(parent.get(vertex)));
+            return parent.get(vertex);
         }
-        return parent.get(vertex);
+        return vertex;
     }
 
 
