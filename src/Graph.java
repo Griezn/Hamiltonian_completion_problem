@@ -1,7 +1,4 @@
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Stack;
+import java.util.*;
 
 
 /**
@@ -9,11 +6,13 @@ import java.util.Stack;
  *
  * @param <Vertex> the type of the vertices
  * @author Seppe Degryse
- * @version 1.0
+ * @version 1.3
  */
 public class Graph<Vertex> implements GraphInterface<Vertex> {
 
     private final HashMap<Vertex, HashSet<Vertex>> adjacencyList = new HashMap<>();
+
+    private final ArrayList<Vertex> vertices = new ArrayList<>();
 
     private int numberOfEdges = 0;
 
@@ -28,9 +27,11 @@ public class Graph<Vertex> implements GraphInterface<Vertex> {
     {
         if (!adjacencyList.containsKey(start)) {
             adjacencyList.put(start, new HashSet<>());
+            vertices.add(start);
         }
         if (!adjacencyList.containsKey(end)) {
             adjacencyList.put(end, new HashSet<>());
+            vertices.add(end);
         }
         adjacencyList.get(start).add(end);
         adjacencyList.get(end).add(start);
@@ -41,8 +42,9 @@ public class Graph<Vertex> implements GraphInterface<Vertex> {
 
     /**
      * Removes an edge from the graph.
+     *
      * @param start the starting point of the edge
-     * @param end the end point of the edge
+     * @param end   the end point of the edge
      */
     public void removeEdge(Vertex start, Vertex end)
     {
@@ -59,7 +61,7 @@ public class Graph<Vertex> implements GraphInterface<Vertex> {
     @Override
     public Collection<Vertex> getVertices()
     {
-        return adjacencyList.keySet();
+        return vertices;
     }
 
 
@@ -79,7 +81,7 @@ public class Graph<Vertex> implements GraphInterface<Vertex> {
     @Override
     public int getNumberOfVertices()
     {
-        return adjacencyList.size();
+        return vertices.size();
     }
 
 
@@ -209,6 +211,7 @@ public class Graph<Vertex> implements GraphInterface<Vertex> {
 
     /**
      * Apply the local search algorithm. It returns an estimate for the minimum path partition number
+     *
      * @param tree the tree to apply the local search algorithm on
      * @return the minimum path partition number
      */
@@ -234,6 +237,7 @@ public class Graph<Vertex> implements GraphInterface<Vertex> {
 
     /**
      * Apply the metaheuristic search algorithm. It returns an estimate for the minimum path partition number
+     *
      * @param tree the tree to apply the metaheuristic search algorithm on
      * @return the minimum path partition number
      */
@@ -241,7 +245,7 @@ public class Graph<Vertex> implements GraphInterface<Vertex> {
     {
         double Tmax = 100;
         double Tmin = 0.1;
-        double alpha = 0.933254;
+        double alpha = 0.93;
         int pp = tree.getMinimumPathPartitionNumber();
         int smallestPP = pp;
 
@@ -261,12 +265,11 @@ public class Graph<Vertex> implements GraphInterface<Vertex> {
                 double p = Math.exp((pp - newPP) / Tmax);
                 if (Math.random() < p) {
                     pp = newPP;
+                    Tmax *= alpha;
                 } else {
                     return smallestPP;
                 }
             }
-
-            Tmax *= alpha;
         }
 
         return smallestPP;
@@ -275,6 +278,7 @@ public class Graph<Vertex> implements GraphInterface<Vertex> {
 
     /**
      * Evaluating a tree means calculating the density, connectivity and isolated vertices.
+     *
      * @param tree the tree to evaluate
      * @return the evaluation of the tree
      * @see Graph#metaheuristicSearch(Tree)
@@ -287,5 +291,11 @@ public class Graph<Vertex> implements GraphInterface<Vertex> {
         float isolated = (float) tree.getNumberOfIsolated() / tree.getNumberOfVertices();
 
         return density + connectivity - isolated;
+    }
+
+
+    public void shuffleVertices()
+    {
+        Collections.shuffle((List<?>) getVertices());
     }
 }
