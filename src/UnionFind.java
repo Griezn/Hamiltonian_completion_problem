@@ -1,6 +1,12 @@
 import java.util.HashMap;
 
 
+/**
+ * A class representing a disjoint set.
+ * @param <Vertex> the type of the vertices
+ * @author Seppe Degryse
+ * @version 1.1
+ */
 public class UnionFind<Vertex> {
 
     private final HashMap<Vertex, Integer> size = new HashMap<>();
@@ -12,12 +18,21 @@ public class UnionFind<Vertex> {
     }
 
 
+    /**
+     * Getter for the direct parent of a vertex.
+     * @param vertex the vertex
+     * @return the parent of the vertex
+     */
     public Vertex getParent(Vertex vertex)
     {
         return parent.get(vertex);
     }
 
 
+    /**
+     * Adds a vertex to the disjoint set.
+     * @param vertex the vertex to add
+     */
     public void makeSet(Vertex vertex)
     {
         parent.put(vertex, vertex);
@@ -25,6 +40,11 @@ public class UnionFind<Vertex> {
     }
 
 
+    /**
+     * Finds the parent of the set of a vertex.
+     * @param vertex the vertex
+     * @return the parent of the set of the vertex
+     */
     public Vertex find(Vertex vertex)
     {
         if (parent.get(vertex) != vertex) {
@@ -35,6 +55,11 @@ public class UnionFind<Vertex> {
     }
 
 
+    /**
+     * Unites the sets of two vertices.
+     * @param v the first vertex
+     * @param u the second vertex
+     */
     public void union(Vertex v, Vertex u)
     {
         v = find(v);
