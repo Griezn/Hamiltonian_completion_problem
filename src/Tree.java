@@ -6,7 +6,7 @@ import java.util.*;
  * @param <Vertex> the type of the vertices
  * @see Graph
  * @author Seppe Degryse
- * @version 2.0
+ * @version 2.4
  */
 public class Tree<Vertex> extends Graph<Vertex> implements TreeInterface<Vertex> {
 
@@ -192,7 +192,6 @@ public class Tree<Vertex> extends Graph<Vertex> implements TreeInterface<Vertex>
 
         for (Vertex z : copy) {
             if (z == x || z == y) continue;
-
             removeEdge(v, z);
         }
     }
@@ -229,7 +228,7 @@ public class Tree<Vertex> extends Graph<Vertex> implements TreeInterface<Vertex>
     public void perturb(Graph<Vertex> graph)
     {
         connectPaths(graph);
-        rotationMoves(graph);
+        //rotationMoves(graph);
         restoreTree(graph);
     }
 
@@ -244,6 +243,8 @@ public class Tree<Vertex> extends Graph<Vertex> implements TreeInterface<Vertex>
     {
         resetUnionFind();
         generateUnionFind();
+
+        shuffleVertices();
         for (Vertex v : getVertices()) {
             if (getDegree(v) > 1) continue;
 
@@ -280,11 +281,11 @@ public class Tree<Vertex> extends Graph<Vertex> implements TreeInterface<Vertex>
                 if (getDegree(x) != 1){
                     removeEdge(v, x);
                     checkedAddEdge(v, w);
-                    return;
+                    break;
                 } else if(getDegree(y) != 1){
                     removeEdge(v, y);
                     checkedAddEdge(v, w);
-                    return;
+                    break;
                 }
             }
         }
@@ -298,13 +299,19 @@ public class Tree<Vertex> extends Graph<Vertex> implements TreeInterface<Vertex>
      */
     public void restoreTree(Graph<Vertex> graph)
     {
+        resetUnionFind();
+        generateUnionFind();
         int n = getNumberOfVertices() - 1;
+
+        shuffleVertices();
         for (Vertex v : getVertices()) {
             for (Vertex w : graph.getNeighborsOf(v)) {
-                if (getNumberOfEdges() >= n) return;
-
                 if (canHaveAsEdge(v, w)) {
                     checkedAddEdge(v, w);
+                }
+
+                if (getNumberOfEdges() >= n) {
+                    return;
                 }
             }
         }
