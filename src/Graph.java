@@ -6,7 +6,7 @@ import java.util.*;
  *
  * @param <Vertex> the type of the vertices
  * @author Seppe Degryse
- * @version 1.3
+ * @version 1.4
  */
 public class Graph<Vertex> implements GraphInterface<Vertex> {
 
@@ -246,27 +246,34 @@ public class Graph<Vertex> implements GraphInterface<Vertex> {
         double Tmax = 100;
         double Tmin = 0.1;
         double alpha = 0.93;
-        int pp = tree.getMinimumPathPartitionNumber();
-        int smallestPP = pp;
+        int smallestPP = tree.getMinimumPathPartitionNumber();
+        float evaluation = evaluate(tree, smallestPP);
 
         while (Tmax > Tmin) {
             tree.perturb(this);
             int newPP = tree.getMinimumPathPartitionNumber();
+            float newEvaluation = evaluate(tree, newPP);
 
             if (newPP == 1) {
                 return 1;
             }
-            if (newPP < pp) {
-                pp = newPP;
-                if (pp < smallestPP) {
-                    smallestPP = pp;
+            if (newEvaluation > evaluation) {
+                evaluation = newEvaluation;
+                if (newPP < smallestPP) {
+                    smallestPP = newPP;
                 }
             } else {
-                double p = Math.exp((pp - newPP) / Tmax);
+                double p = Math.exp((evaluation-newEvaluation) / Tmax);
                 if (Math.random() < p) {
-                    pp = newPP;
+                    evaluation = newEvaluation;
+                    if (newPP < smallestPP) {
+                        smallestPP = newPP;
+                    }
                     Tmax *= alpha;
                 } else {
+                    if (newPP < smallestPP) {
+                        smallestPP = newPP;
+                    }
                     return smallestPP;
                 }
             }
@@ -280,17 +287,18 @@ public class Graph<Vertex> implements GraphInterface<Vertex> {
      * Evaluating a tree means calculating the density, connectivity and isolated vertices.
      *
      * @param tree the tree to evaluate
+     * @param ppn  the path partition number of the tree
      * @return the evaluation of the tree
      * @see Graph#metaheuristicSearch(Tree)
      */
     @SuppressWarnings("unused")
-    public float evaluate(Tree<Vertex> tree)
+    public float evaluate(Tree<Vertex> tree, int ppn)
     {
-        float connectivity = (float) tree.getMinimumPathPartitionNumber();
         float density = (float) getNumberOfEdges() / tree.getNumberOfEdges();
         float isolated = (float) tree.getNumberOfIsolated() / tree.getNumberOfVertices();
+        System.out.println("Density: " + density + ", isolated: " + isolated);
 
-        return density + connectivity - isolated;
+        return density - (float) ppn - isolated;
     }
 
 
