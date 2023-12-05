@@ -15,6 +15,7 @@ public class Benchmarks {
     private static final ArrayList<String> graphs = new ArrayList<>();
     private static final ArrayList<Integer> optimalSolutions = new ArrayList<>();
     private static File outputFile;
+    private static final ArrayList<String> results = new ArrayList<>();
 
 
     public static void main(String[] args)
@@ -22,6 +23,7 @@ public class Benchmarks {
         readData();
         createFile();
         runBenchmarks();
+        saveToCsv();
     }
 
 
@@ -50,29 +52,31 @@ public class Benchmarks {
     public static void runBenchmarks()
     {
         int size = graphs.size();
+        int n = 30;
         for (int i = 0; i < size; i++) {
             Graph<Integer> graph = (Graph<Integer>) Constructor.createGraphFromFile(path + graphs.get(i));
             int optimalSolution = optimalSolutions.get(i);
 
 
             long startTime = System.nanoTime();
-            int localSolution = graph.applyLocalSearchAlgorithm(100);
+            int localSolution = graph.applyLocalSearchAlgorithm(n);
             long endTime = System.nanoTime();
             long localDuration = (endTime - startTime) / 1000000;
 
             graph = (Graph<Integer>) Constructor.createGraphFromFile(path + graphs.get(i));
             startTime = System.nanoTime();
-            int metaSolution = graph.applyMetaheuristic(100);
+            int metaSolution = graph.applyMetaheuristic(n);
 
             endTime = System.nanoTime();
             long metaDuration = (endTime - startTime) / 1000000;
 
-            saveToCsv(graphs.get(i), optimalSolution, localSolution, metaSolution, localDuration, metaDuration);
-            System.out.println(i + 1 + " /" + size + " done in " + metaDuration + "ms");
+            saveResult(graphs.get(i), optimalSolution, localSolution, metaSolution, localDuration, metaDuration);
+            System.out.println(i + 1 + " /" + size + " done in " + (metaDuration + localDuration) + "ms");
         }
     }
 
 
+    @SuppressWarnings("unused")
     public static void printResult(String graph, int optimal, int localSolution, int metaSolution, long localTime, long metaTime)
     {
         System.out.println("Graph: " + graph);
@@ -85,17 +89,25 @@ public class Benchmarks {
     }
 
 
-    public static void saveToCsv(String graph, int optimal, int localSolution, int metaSolution, long localTime, long metaTime)
+    public static void saveResult(String graph, int optimal, int localSolution, int metaSolution, long localTime, long metaTime)
     {
         String line = graph + "," + optimal + "," + localSolution + "," + metaSolution + "," + localTime + "," + metaTime;
-        try {
-            FileWriter fw = new FileWriter(outputFile, true);
-            BufferedWriter bw = new BufferedWriter(fw);
-            bw.write(line);
-            bw.newLine();
-            bw.close();
-        } catch (Exception e) {
-            System.out.println("Error writing to file");
+        results.add(line);
+    }
+
+
+    public static void saveToCsv()
+    {
+        for (String line : results) {
+            try {
+                FileWriter fw = new FileWriter(outputFile, true);
+                BufferedWriter bw = new BufferedWriter(fw);
+                bw.write(line);
+                bw.newLine();
+                bw.close();
+            } catch (Exception e) {
+                System.out.println("Error writing to file");
+            }
         }
     }
 }
