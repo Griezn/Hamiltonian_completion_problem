@@ -70,6 +70,7 @@ public class GraphTests {
         assertFalse(tree.canHaveAsEdge(1, 4));
         assertFalse(tree.canHaveAsEdge(5, 4));
         assertFalse(tree.canHaveAsEdge(6, 5));
+        assertFalse(tree.canHaveAsEdge(0, 1));
     }
 
 
@@ -172,15 +173,37 @@ public class GraphTests {
         return graph;
     }
 
+
     private Graph<Integer> createTestGraph2()
     {
-        return (Graph<Integer>) Constructor.createGraphFromFile("./Benchmarks/testingConnected/structured_tree_8_3");
+        return (Graph<Integer>) Constructor.createGraphFromFile("./Benchmarks/testingConnected/structured_tree_2_3");
     }
+
 
     private Graph<Integer> createTestGraphStarRandomLeaves()
     {
         return (Graph<Integer>) Constructor.createGraphFromFile("./Benchmarks/testingConnected/star_random_leaves_connected_100.in");
     }
+
+
+    private Graph<Integer> createTestGridGraph(int n)
+    {
+        Graph<Integer> graph = new Graph<>();
+
+        for (int i = 0; i < n * n; i++) {
+            if (i % n != 0) {
+                graph.addEdge(i, i - 1);
+            }
+            if (i >= n) {
+                graph.addEdge(i, i - n);
+            }
+        }
+
+        assertEquals(n*n, graph.getNumberOfVertices());
+        assertEquals((n-1)*n*2, graph.getNumberOfEdges());
+        return graph;
+    }
+
 
     @Test
     public void testPathCover()
@@ -188,6 +211,7 @@ public class GraphTests {
         Tree<Integer> tree = createTestTree1();
         assertEquals(6, tree.getMinimumPathPartitionNumber());
     }
+
 
     @Test
     public void testInitialSpanningTree()
@@ -198,17 +222,18 @@ public class GraphTests {
         assertEquals(19, tree.getNumberOfEdges());
     }
 
+
     @Test
     public void testStructuredTree()
     {
         Graph<Integer> graph = createTestGraph2();
         Tree<Integer> tree = (Tree<Integer>) graph.getInitialSpanningTree();
-        assertEquals(9841, tree.getNumberOfVertices());
-        assertEquals(9840, tree.getNumberOfEdges());
+        assertEquals(13, tree.getNumberOfVertices());
+        assertEquals(12, tree.getNumberOfEdges());
 
-        int pp = graph.applyLocalSearchAlgorithm(100);
-        System.out.println(pp);
+        int hcn = graph.applyLocalSearchAlgorithm(20);
     }
+
 
     @Test
     public void testStarRandomLeaves15()
@@ -218,7 +243,19 @@ public class GraphTests {
         assertEquals(101, tree.getNumberOfVertices());
         assertEquals(100, tree.getNumberOfEdges());
 
-        int pp = graph.applyLocalSearchAlgorithm(100);
-        System.out.println(pp);
+        int hcn = graph.applyLocalSearchAlgorithm(100);
+    }
+
+
+    @Test
+    public void testGridGraph()
+    {
+        int n = 20;
+        Graph<Integer> graph = createTestGridGraph(n);
+        Tree<Integer> tree = (Tree<Integer>) graph.getInitialSpanningTree();
+        assertEquals(n * n, tree.getNumberOfVertices());
+        assertEquals(n*n - 1, tree.getNumberOfEdges());
+
+        int hcn = graph.applyLocalSearchAlgorithm(100);
     }
 }
