@@ -4,7 +4,7 @@ public class Main {
 
     public static void main(String[] args)
     {
-        Graph<Integer> graph = (Graph<Integer>) Constructor.createGraphFromFile("./Benchmarks/testingConnected/er_13_9.in");
+        Graph<Integer> graph = (Graph<Integer>) Constructor.createGraphFromFile("./Benchmarks/testingConnected/circle_like_30000_10.in");
 
         long startTime = System.nanoTime();
         System.out.println(graph.applyMetaheuristic(30));
