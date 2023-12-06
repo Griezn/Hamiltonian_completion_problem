@@ -56,12 +56,21 @@ public class Graph<Vertex> implements GraphInterface<Vertex> {
 
 
     /**
-     * Returns a collection of integers representing the vertices of the graph.
+     * @return a collection of integers representing the vertices of the graph.
      */
     @Override
     public Collection<Vertex> getVertices()
     {
         return vertices;
+    }
+
+
+    /**
+     * @return a collection of integers representing the vertices of the graph
+     */
+    public Collection<Vertex> getVerticesSet()
+    {
+        return adjacencyList.keySet();
     }
 
 
@@ -141,7 +150,7 @@ public class Graph<Vertex> implements GraphInterface<Vertex> {
         while (!stack.isEmpty()) {
             Vertex v = stack.pop();
             for (Vertex u : getNeighborsOf(v)) {
-                if (tree.getVertices().contains(u)) continue;
+                if (tree.getVerticesSet().contains(u)) continue;
                 tree.addEdge(v, u);
                 stack.push(u);
             }
@@ -296,7 +305,6 @@ public class Graph<Vertex> implements GraphInterface<Vertex> {
     {
         float density = (float) getNumberOfEdges() / tree.getNumberOfEdges();
         float isolated = (float) tree.getNumberOfIsolated() / tree.getNumberOfVertices();
-        System.out.println("Density: " + density + ", isolated: " + isolated);
 
         return density - (float) ppn - isolated;
     }
