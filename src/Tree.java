@@ -70,7 +70,7 @@ public class Tree<Vertex> extends Graph<Vertex> implements TreeInterface<Vertex>
      */
     public Boolean canHaveAsRoot(Vertex root)
     {
-        return getVertices().contains(root);
+        return getVerticesSet().contains(root);
     }
 
 
