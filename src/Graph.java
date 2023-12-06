@@ -10,11 +10,25 @@ import java.util.*;
  */
 public class Graph<Vertex> implements GraphInterface<Vertex> {
 
-    private final HashMap<Vertex, HashSet<Vertex>> adjacencyList = new HashMap<>();
+    private final HashMap<Vertex, HashSet<Vertex>> adjacencyList;
 
-    private final ArrayList<Vertex> vertices = new ArrayList<>();
+    private final ArrayList<Vertex> vertices;
 
     private int numberOfEdges = 0;
+
+
+    Graph()
+    {
+        adjacencyList = new HashMap<>();
+        vertices = new ArrayList<>();
+    }
+
+
+    Graph(int size)
+    {
+        adjacencyList = new HashMap<>(size, 1);
+        vertices = new ArrayList<>(size);
+    }
 
 
     /**
@@ -139,7 +153,7 @@ public class Graph<Vertex> implements GraphInterface<Vertex> {
     @SuppressWarnings("unchecked")
     public TreeInterface<Vertex> getInitialSpanningTree()
     {
-        Tree<Vertex> tree = new Tree<>();
+        Tree<Vertex> tree = new Tree<>(getNumberOfVertices());
         // random number between 0 and the number of vertices
         int random = (int) (Math.random() * getNumberOfVertices());
         Vertex root = (Vertex) getVertices().toArray()[random];
@@ -170,23 +184,23 @@ public class Graph<Vertex> implements GraphInterface<Vertex> {
     @Override
     public int applyLocalSearchAlgorithm(int maxIterations)
     {
-        int smallestPP = Integer.MAX_VALUE;
+        int smallestPPN = Integer.MAX_VALUE;
         int amountOfTrees = 0;
 
         int num = Math.min(maxIterations, getNumberOfVertices());
         while (amountOfTrees < num) {
             Tree<Vertex> tree = (Tree<Vertex>) getInitialSpanningTree();
-            int pp = localSearch(tree);
-            if (pp == 1) {
+            int ppn = localSearch(tree);
+            if (ppn == 1) {
                 return 0;
             }
-            if (pp < smallestPP) {
-                smallestPP = pp;
+            if (ppn < smallestPPN) {
+                smallestPPN = ppn;
             }
             amountOfTrees++;
         }
 
-        return smallestPP - 1;
+        return smallestPPN - 1;
     }
 
 
@@ -198,23 +212,23 @@ public class Graph<Vertex> implements GraphInterface<Vertex> {
     @Override
     public int applyMetaheuristic(int maxIterations)
     {
-        int smallestPP = Integer.MAX_VALUE;
+        int smallestPPN = Integer.MAX_VALUE;
         int amountOfTrees = 0;
 
         int num = Math.min(maxIterations, getNumberOfVertices());
         while (amountOfTrees < num) {
             Tree<Vertex> tree = (Tree<Vertex>) getInitialSpanningTree();
-            int pp = metaheuristicSearch(tree);
-            if (pp == 1) {
+            int ppn = metaheuristicSearch(tree);
+            if (ppn == 1) {
                 return 0;
             }
-            if (pp < smallestPP) {
-                smallestPP = pp;
+            if (ppn < smallestPPN) {
+                smallestPPN = ppn;
             }
             amountOfTrees++;
         }
 
-        return smallestPP - 1;
+        return smallestPPN - 1;
     }
 
 
@@ -226,19 +240,19 @@ public class Graph<Vertex> implements GraphInterface<Vertex> {
      */
     public int localSearch(Tree<Vertex> tree)
     {
-        int pp = tree.getMinimumPathPartitionNumber();
+        int ppn = tree.getMinimumPathPartitionNumber();
 
         while (true) {
             tree.perturb(this);
-            int newPP = tree.getMinimumPathPartitionNumber();
+            int newPPN = tree.getMinimumPathPartitionNumber();
 
-            if (newPP == 1) {
+            if (newPPN == 1) {
                 return 1;
             }
-            if (newPP < pp) {
-                pp = newPP;
+            if (newPPN < ppn) {
+                ppn = newPPN;
             } else {
-                return pp;
+                return ppn;
             }
         }
     }
@@ -255,40 +269,40 @@ public class Graph<Vertex> implements GraphInterface<Vertex> {
         double Tmax = 100;
         double Tmin = 0.1;
         double alpha = 0.93;
-        int smallestPP = tree.getMinimumPathPartitionNumber();
-        float evaluation = evaluate(tree, smallestPP);
+        int smallestPPN = tree.getMinimumPathPartitionNumber();
+        float evaluation = evaluate(tree, smallestPPN);
 
         while (Tmax > Tmin) {
             tree.perturb(this);
-            int newPP = tree.getMinimumPathPartitionNumber();
-            float newEvaluation = evaluate(tree, newPP);
+            int newPPN = tree.getMinimumPathPartitionNumber();
+            float newEvaluation = evaluate(tree, newPPN);
 
-            if (newPP == 1) {
+            if (newPPN == 1) {
                 return 1;
             }
             if (newEvaluation > evaluation) {
                 evaluation = newEvaluation;
-                if (newPP < smallestPP) {
-                    smallestPP = newPP;
+                if (newPPN < smallestPPN) {
+                    smallestPPN = newPPN;
                 }
             } else {
                 double p = Math.exp((evaluation-newEvaluation) / Tmax);
                 if (Math.random() < p) {
                     evaluation = newEvaluation;
-                    if (newPP < smallestPP) {
-                        smallestPP = newPP;
+                    if (newPPN < smallestPPN) {
+                        smallestPPN = newPPN;
                     }
                     Tmax *= alpha;
                 } else {
-                    if (newPP < smallestPP) {
-                        smallestPP = newPP;
+                    if (newPPN < smallestPPN) {
+                        smallestPPN = newPPN;
                     }
-                    return smallestPP;
+                    return smallestPPN;
                 }
             }
         }
 
-        return smallestPP;
+        return smallestPPN;
     }
 
 
@@ -304,9 +318,9 @@ public class Graph<Vertex> implements GraphInterface<Vertex> {
     public float evaluate(Tree<Vertex> tree, int ppn)
     {
         float density = (float) getNumberOfEdges() / tree.getNumberOfEdges();
-        float isolated = (float) tree.getNumberOfIsolated() / tree.getNumberOfVertices();
+        float isolation = (float) tree.getNumberOfIsolated() / tree.getNumberOfVertices();
 
-        return density - (float) ppn - isolated;
+        return density - (float) ppn - isolation;
     }
 
 

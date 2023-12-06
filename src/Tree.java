@@ -12,7 +12,20 @@ public class Tree<Vertex> extends Graph<Vertex> implements TreeInterface<Vertex>
 
     private Vertex root = null;
 
-    private final UnionFind<Vertex> vertexUnionFind = new UnionFind<>();
+    private final UnionFind<Vertex> vertexUnionFind;
+
+
+    Tree()
+    {
+        vertexUnionFind = new UnionFind<>();
+    }
+
+
+    Tree(int size)
+    {
+        super(size);
+        vertexUnionFind = new UnionFind<>(size);
+    }
 
 
     /**
@@ -264,6 +277,7 @@ public class Tree<Vertex> extends Graph<Vertex> implements TreeInterface<Vertex>
      * Changes routes on a certain path partition of the tree.
      *
      * @param graph the graph to apply the rotation move operator with
+     * @deprecated This method is not used anymore because it is faulty.
      */
     @SuppressWarnings({"unchecked", "unused"})
     public void rotationMoves(Graph<Vertex> graph)
@@ -299,8 +313,6 @@ public class Tree<Vertex> extends Graph<Vertex> implements TreeInterface<Vertex>
      */
     public void restoreTree(Graph<Vertex> graph)
     {
-        resetUnionFind();
-        generateUnionFind();
         int n = getNumberOfVertices() - 1;
 
         shuffleVertices();
@@ -319,7 +331,7 @@ public class Tree<Vertex> extends Graph<Vertex> implements TreeInterface<Vertex>
 
 
     /**
-     * Returns the number of isolated vertices in the tree.
+     * Returns the number of isolated vertices in the tree. Vertices with degree 0.
      *
      * @return the number of isolated vertices
      */
