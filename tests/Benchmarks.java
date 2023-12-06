@@ -71,7 +71,7 @@ public class Benchmarks {
             long metaDuration = (endTime - startTime) / 1000000;
 
             saveResult(graphs.get(i), optimalSolution, localSolution, metaSolution, localDuration, metaDuration);
-            System.out.println(i + 1 + " /" + size + " done in " + (metaDuration + localDuration) + "ms");
+            System.err.println(i + 1 + " /" + size + " done in " + (metaDuration + localDuration) + "ms");
         }
     }
 
