@@ -231,17 +231,20 @@ public class Tree<Vertex> extends Graph<Vertex> implements TreeInterface<Vertex>
 
 
     /**
-     * Applies the move operator to the tree.
+     * Applies the move operator to the tree. This method will reset and regenerate the union find.
      *
      * @param graph the graph to apply the move operator with
      * @see Tree#connectPaths(Graph)
-     * @see Tree#rotationMoves(Graph)
      * @see Tree#restoreTree(Graph)
      */
     public void perturb(Graph<Vertex> graph)
     {
+        resetUnionFind();
+        generateUnionFind();
+
+        shuffleVertices();
+
         connectPaths(graph);
-        //rotationMoves(graph);
         restoreTree(graph);
     }
 
@@ -254,10 +257,6 @@ public class Tree<Vertex> extends Graph<Vertex> implements TreeInterface<Vertex>
      */
     public void connectPaths(Graph<Vertex> graph)
     {
-        resetUnionFind();
-        generateUnionFind();
-
-        shuffleVertices();
         for (Vertex v : getVertices()) {
             if (getDegree(v) > 1) continue;
 
@@ -315,7 +314,6 @@ public class Tree<Vertex> extends Graph<Vertex> implements TreeInterface<Vertex>
     {
         int n = getNumberOfVertices() - 1;
 
-        shuffleVertices();
         for (Vertex v : getVertices()) {
             for (Vertex w : graph.getNeighborsOf(v)) {
                 if (canHaveAsEdge(v, w)) {
