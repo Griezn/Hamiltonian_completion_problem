@@ -37,7 +37,7 @@ public class Constructor {
             }
 
         } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("File " + path + " not found!");
         }
 
         if (vertices != graph.getNumberOfVertices() ||
